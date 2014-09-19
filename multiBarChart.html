@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link href="nv.d3.css" rel="stylesheet" type="text/css">
+
+<style>
+body {
+  overflow-y:scroll;
+}
+
+text {
+  font: 12px sans-serif;
+}
+
+#chart1 {
+  height: 500px;
+  margin: 10px;
+  min-width: 100px;
+  min-height: 100px;
+}
+</style>
+
+<body>
+  <div id="chart1">
+    <svg></svg>
+  </div>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="d3.v2.js"></script>
+<script src="nv.d3.js"></script>
+<script src="axis.js"></script>
+<script src="multiBar.js"></script>
+<script src="multiBarChart.js"></script>
+<script src="stream_layers.js"></script>
+<script>
+
+var test_data = stream_layers(1,10,.1).map(function(data, i) {
+  return {
+    key: 'Stream' + i,
+    values: data
+  };
+});
+
+var chart;
+nv.addGraph(function() {
+    chart = nv.models.multiBarChart().showControls(false);
+
+    chart.xAxis
+        .showMaxMin(true)
+        .tickFormat(d3.format(',f'));
+
+    chart.yAxis
+        .tickFormat(d3.format(',.1f'));
+
+    d3.select('#chart1 svg')
+        .datum(test_data)
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+
+    $(".nv-y2").find("line").remove();
+
+    return chart;
+});
+
+</script>
